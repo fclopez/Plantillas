@@ -1,0 +1,4 @@
+C:\Users\pruebas2\Desktop\OOlaya\pruebaflopez\pruebaflopez\bin\pruebaflopez.dll
+C:\Users\pruebas2\Desktop\OOlaya\pruebaflopez\pruebaflopez\bin\pruebaflopez.pdb
+C:\Users\pruebas2\Desktop\OOlaya\pruebaflopez\pruebaflopez\obj\Debug\pruebaflopez.dll
+C:\Users\pruebas2\Desktop\OOlaya\pruebaflopez\pruebaflopez\obj\Debug\pruebaflopez.pdb
