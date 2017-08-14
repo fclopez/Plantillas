@@ -1,0 +1,7 @@
+com\fclopez\springcrud\config\AppInitializer.class
+com\fclopez\springcrud\controller\ElementoController.class
+com\fclopez\springcrud\repository\ElementoRepository.class
+com\fclopez\springcrud\config\AppConfiguration.class
+com\fclopez\springcrud\config\JpaConfiguration.class
+com\fclopez\springcrud\entities\Elemento2_.class
+com\fclopez\springcrud\entities\Elemento2.class
