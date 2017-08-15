@@ -1,0 +1,9 @@
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\CRUDmvc.dll
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\CRUDmvc.pdb
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\EntityFramework.dll
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\EntityFramework.SqlServer.dll
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\EntityFramework.xml
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\bin\EntityFramework.SqlServer.xml
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\obj\Debug\ResolveAssemblyReference.cache
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\obj\Debug\CRUDmvc.dll
+c:\users\flopez\documents\visual studio 2010\projects\CRUDmvc\CRUDmvc\obj\Debug\CRUDmvc.pdb
