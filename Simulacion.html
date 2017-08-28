@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Sistema de colas - Simulacion</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="panel panel-primary">
+            <div class="panel-heading"></div>
+            <div class="panel-body">
+                <div>
+                    <button class="btn btn-default" id="btnArrivo">Agregar Arrivo</button>
+                    <button class="btn btn-default" id="btnServicio">Agregar Servicio</button>
+                    <button class="btn btn-default" id="btnSimulacion">Comenzar simulación</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading"></div>
+            <div class="panel-body">
+                <div id="pnlTablaArrivos">
+                    <table id="tbArrivos" border="1">
+                        <thead>
+                            <tr>
+                                <th>Tiempo entre Arrivos</th>
+                                <th>Probabilidad</th>
+                                <th>Probalilidad Acum</th>
+                                <th>Rango Inicial</th>
+                                <th>Rango Final</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <br />
+                <div id="pnlTablaServicio">
+                    <table id="tbServicio" border="1">
+                        <thead>
+                            <tr>
+                                <th>Tiempo servicio</th>
+                                <th>Probabilidad</th>
+                                <th>Probalilidad Acum</th>
+                                <th>Rango Inicial</th>
+                                <th>Rango Final</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading"></div>
+            <div class="panel-body">
+                <div class="tb" id="pnlTablaSimulacion" style="display:none">
+                    <table id="tbSimulacion" border="1">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Arrivo Aleatorio</th>
+                                <th>Tiempo Entre Arrivos</th>
+                                <th>Hora de Llegada</th>
+                                <th>Hora Empieza Servicio</th>
+                                <th>Servicio Aleatorio</th>
+                                <th>Tiempo Servicio</th>
+                                <th>Hora Fin Servicio</th>
+                                <th>Tiempo Cola</th>
+                                <th>Tiempo del Sistema</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+        /*logica manejo de arreglo de datos*/
+        var tiempo_arrivos = [[1, 0.125, 0, 0, 0],
+        [2, 0.125, 0, 0, 0],
+        [3, 0.125, 0, 0, 0],
+        [4, 0.125, 0, 0, 0],
+        [5, 0.125, 0, 0, 0],
+        [6, 0.125, 0, 0, 0],
+        [7, 0.125, 0, 0, 0],
+        [8, 0.125, 0, 0, 0]];
+
+        var tiempo_servicio = [[1, 0.10, 0, 0, 0],
+        [2, 0.20, 0, 0, 0],
+        [3, 0.30, 0, 0, 0],
+        [4, 0.25, 0, 0, 0],
+        [5, 0.10, 0, 0, 0],
+        [6, 0.05, 0, 0, 0]];
+
+        var data_simulacion = [];
+        var tiempo_simulacion = 0;
+        var rowini = "<tr><td>";
+        var rowend = "</td></tr>";
+        var rowconex = "</td><td>";
+
+        $(document).ready(() => {
+            calcularTabla(1, tiempo_arrivos);
+            calcularTabla(2, tiempo_servicio);
+        });
+
+        $('#btnSimulacion').click(() => {
+            cargarDistribucionArrivo();
+        });
+
+        /*validar campos vacios*/
+        $('#btnArrivo').click(() => {
+            bootbox.alert({
+                title: "Agregar arrivo",
+                message: '<div><div class="input-group">'
+                + '<span class="label label-default">Tiempo de Arrivo</span>'
+                + '<input type="text" class="form-control" placeholder="Tiempo de Arrivo" id="txtTiempoArrivo" >'
+                + '</div>'
+                + '<div class="input-group">'
+                + '<span class="label label-default">Probabilidad de Arrivo</span>'
+                + '<input type="text" class="form-control" placeholder="Probabilidad de Arrivo" id="txtProbArrivo">'
+                + '</div>'
+                + '</div>',
+                callback: function () {
+                    var tiempo = $('#txtTiempoArrivo').val();
+                    var prob = $('#txtProbArrivo').val();
+                    tiempo_arrivos.push([tiempo, prob,0,0,0]);
+                }
+            });
+        });
+
+        /*validar campos vacios*/
+        $('#btnServicio').click(() => {
+            bootbox.alert({
+                title: "Agregar Servicio",
+                message: '<div><div class="input-group">'
+                + '<span class="label label-default">Tiempo de Servicio</span>'
+                + '<input type="text" class="form-control" placeholder="Tiempo de Servicio" id="txtTiempoServicio" >'
+                + '</div>'
+                + '<div class="input-group">'
+                + '<span class="label label-default">Probabilidad de Servicio</span>'
+                + '<input type="text" class="form-control" placeholder="Probabilidad de Servicio" id="txtProbServicio">'
+                + '</div>'
+                + '</div>',
+                callback: function () {
+                    var tiempo = $('#txtTiempoServicio').val();
+                    var prob = $('#txtProbServicio').val();
+                    tiempo_servicio.push([tiempo, prob, 0, 0, 0]);
+                }
+            });
+        });
+
+
+        function cargarDistribucionArrivo() {
+            tiempo_simulacion = prompt('Ingrese un entero para el tiempo de simulación', '');
+            if (tiempo_simulacion != 0 && tiempo_simulacion != null && tiempo_simulacion != "") {
+                controlarTiempoSimulacion(data_simulacion, tiempo_simulacion);
+            }  
+        }
+
+        /*calcula las distribuciones de probabilidad para los tiempos de arrivo y servicio de acuerdo a los datos ingresados*/
+        function calcularTabla(filtro, data) {
+            console.log("calcularTabla");
+            var prob_acum = 0;
+            for (var i = 0; i < data.length; i++) {
+                prob_acum += data[i][1];
+                data[i][2] = prob_acum.toFixed(3);
+
+                if (i == 0) {
+                    data[i][4] = prob_acum.toFixed(3);
+                } else {
+                    data[i][3] = data[i - 1][4];
+                    data[i][4] = prob_acum.toFixed(3);
+                }
+
+            }
+            cargarTable(filtro, data);
+        }
+
+        /*conmuta la carga de las distribuciones de probabilidad para los tiempos de arrivo y servicio */
+        function cargarTable(filtro, data) {
+            console.log("cargarTable");
+            var row = "";
+            $.each(data, (index, val) => {
+                row += rowini + val[0] + rowconex + val[1] + rowconex + val[2] + rowconex + val[3] + rowconex + val[4] + rowend;
+            });
+
+            (filtro == 1) ? $('#tbArrivos > tbody:last-child').append(row) : $('#tbServicio > tbody:last-child').append(row);
+        }
+
+        /*Controla la ejecucion y carga de datos de la simulación*/
+        function controlarTiempoSimulacion(data, limite) {
+            console.log("calcularSimulacion");
+            var sumatoria = 0;
+
+            while (sumatoria < limite) {
+                sumatoria = 0;
+
+                calcularArrivoxServicio(data, tiempo_arrivos, tiempo_servicio);
+                calcularColaSimulacion(data);
+
+                $.each(data, (index, v) => {
+                    sumatoria += v[9];
+                });
+            }
+            console.log("sumatoria => " + sumatoria);
+            console.log("tiempo_simulacion => " + tiempo_simulacion);
+            cargarTablaSimulacion(data);
+        }
+
+
+        function calcularArrivoxServicio(simulacion, probArrivo, probServicio) {
+            console.log("calcularArrivoxServicio");
+            var randomArrivos = (Math.random() * (1.0 - 0.000) + 0.000).toFixed(3);
+            var randomServicio = (Math.random() * (1.0 - 0.000) + 0.000).toFixed(3);
+            var indice = simulacion.length;
+
+            $.each(probArrivo, (index, v) => {
+                if (randomArrivos >= v[3] && randomArrivos <= v[4]) {
+                    simulacion.push([indice + 1, randomArrivos, v[0], 0, 0, 0, 0, 0, 0, 0]);
+                }
+            });
+
+            $.each(probServicio, (index, v) => {
+                if (randomServicio >= v[3] && randomServicio <= v[4]) {
+                    simulacion[indice][5] = randomServicio;
+                    simulacion[indice][6] = v[0];
+                }
+            })
+        }
+
+        function calcularColaSimulacion(data) {
+            console.log("calcularColaSimulacion");
+
+            for (var i = 0; i < data.length; i++) {
+                if (i != 0) {
+                    data[i][3] = data[i][2] + data[i - 1][3]; /*hora de llegada*/
+                    data[i][4] = (data[i - 1][7] > data[i][3]) ? data[i - 1][7] : data[i][3]; /*empieza servicio*/
+                    data[i][7] = data[i][4] + data[i][6]; /*termina servicio*/
+                } else {
+                    data[i][3] = 0; /*hora de llegada*/
+                    data[i][4] = 0; /*empieza servicio*/
+                    data[i][7] = data[i][6]; /*termina servicio*/
+                }
+                data[i][8] = data[i][4] - data[i][3]; /*tiempo cola*/
+                data[i][9] = data[i][6] + data[i][8]; /*tiempo sistema*/
+            }
+
+        }
+
+        function cargarTablaSimulacion(data) {
+            console.log("cargarTablaSimulacion");
+            var row = "";
+            $.each(data, (index, val) => {
+                row += rowini + val[0] + rowconex + val[1] + rowconex + val[2] + rowconex + val[3] + rowconex + val[4] + rowconex + val[5] + rowconex + val[6] + rowconex + val[7] + rowconex + val[8] + rowconex + val[9] + rowend;
+            });
+            $('#tbSimulacion > tbody').html("");
+            $('#tbSimulacion > tbody:last-child').append(row);
+            $('#pnlTablaSimulacion').show();
+        }
+
+
+    </script>
+</body>
+</html>
