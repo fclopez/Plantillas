@@ -22,9 +22,9 @@
         </div>
 
         <div class="panel panel-primary">
-            <div class="panel-heading"></div>
+            <div class="panel-heading">Distribuciones de tiempo para Arrivos y Servicios</div>
             <div class="panel-body">
-                <div id="pnlTablaArrivos">
+                <div id="pnlTablaArrivos" style="display:none">
                     <table id="tbArrivos" border="1">
                         <thead>
                             <tr>
@@ -39,7 +39,7 @@
                     </table>
                 </div>
                 <br />
-                <div id="pnlTablaServicio">
+                <div id="pnlTablaServicio" style="display:none">
                     <table id="tbServicio" border="1">
                         <thead>
                             <tr>
@@ -58,7 +58,7 @@
         </div>
 
         <div class="panel panel-primary">
-            <div class="panel-heading"></div>
+            <div class="panel-heading">Simulacion de una cola</div>
             <div class="panel-body">
                 <div class="tb" id="pnlTablaSimulacion" style="display:none">
                     <table id="tbSimulacion" border="1">
@@ -87,22 +87,8 @@
     <script type="text/javascript">
 
         /*logica manejo de arreglo de datos*/
-        var tiempo_arrivos = [[1, 0.125, 0, 0, 0],
-        [2, 0.125, 0, 0, 0],
-        [3, 0.125, 0, 0, 0],
-        [4, 0.125, 0, 0, 0],
-        [5, 0.125, 0, 0, 0],
-        [6, 0.125, 0, 0, 0],
-        [7, 0.125, 0, 0, 0],
-        [8, 0.125, 0, 0, 0]];
-
-        var tiempo_servicio = [[1, 0.10, 0, 0, 0],
-        [2, 0.20, 0, 0, 0],
-        [3, 0.30, 0, 0, 0],
-        [4, 0.25, 0, 0, 0],
-        [5, 0.10, 0, 0, 0],
-        [6, 0.05, 0, 0, 0]];
-
+        var tiempo_arrivos = [];
+        var tiempo_servicio = [];
         var data_simulacion = [];
         var tiempo_simulacion = 0;
         var rowini = "<tr><td>";
@@ -110,12 +96,17 @@
         var rowconex = "</td><td>";
 
         $(document).ready(() => {
-            calcularTabla(1, tiempo_arrivos);
-            calcularTabla(2, tiempo_servicio);
+
         });
 
         $('#btnSimulacion').click(() => {
-            cargarDistribucionArrivo();
+            tiempo_simulacion = prompt('Ingrese un entero para el tiempo de simulación', '');
+            if (tiempo_simulacion != 0 && tiempo_simulacion != null && tiempo_simulacion != "" && tiempo_arrivos.length != 0 && tiempo_servicio.length != 0) {
+                data_simulacion = [];
+                controlarTiempoSimulacion(data_simulacion, tiempo_arrivos, tiempo_servicio, tiempo_simulacion);
+            } else {
+                bootbox.alert('El tiempo de simulacion no puede estar vacio. La distribucion de probabilidad para los tiempos de arrivo y de servicio no puede estar vacia');
+            }
         });
 
         /*validar campos vacios*/
@@ -131,10 +122,15 @@
                 + '<input type="text" class="form-control" placeholder="Probabilidad de Arrivo" id="txtProbArrivo">'
                 + '</div>'
                 + '</div>',
-                callback: function () {
-                    var tiempo = $('#txtTiempoArrivo').val();
-                    var prob = $('#txtProbArrivo').val();
-                    tiempo_arrivos.push([tiempo, prob,0,0,0]);
+                callback: () => {
+                    if ($('#txtTiempoArrivo').val() != "" && $('#txtProbArrivo').val() != "") {
+                        var tiempo = parseInt($('#txtTiempoArrivo').val());
+                        var prob = parseFloat($('#txtProbArrivo').val().replace(",", "."));
+                        tiempo_arrivos.push([tiempo, prob, 0, 0, 0]);
+                        calcularTabla(1, tiempo_arrivos);
+                    } else {
+                        bootbox.alert('Los campos Tiempo de Arrivo y Probabilidad de Arrivo no pueden estar vacios.');
+                    }
                 }
             });
         });
@@ -152,26 +148,23 @@
                 + '<input type="text" class="form-control" placeholder="Probabilidad de Servicio" id="txtProbServicio">'
                 + '</div>'
                 + '</div>',
-                callback: function () {
-                    var tiempo = $('#txtTiempoServicio').val();
-                    var prob = $('#txtProbServicio').val();
-                    tiempo_servicio.push([tiempo, prob, 0, 0, 0]);
+                callback: () => {
+                    if ($('#txtTiempoServicio').val() != "" && $('#txtProbServicio').val() != "") {
+                        var tiempo = parseInt($('#txtTiempoServicio').val());
+                        var prob = parseFloat($('#txtProbServicio').val().replace(",", "."));
+                        tiempo_servicio.push([tiempo, prob, 0, 0, 0]);
+                        calcularTabla(2, tiempo_servicio);
+                    } else {
+                        bootbox.alert('Los campos Tiempo de Servicio y Probabilidad de Servicio no pueden estar vacios.');
+                    }
                 }
             });
         });
 
-
-        function cargarDistribucionArrivo() {
-            tiempo_simulacion = prompt('Ingrese un entero para el tiempo de simulación', '');
-            if (tiempo_simulacion != 0 && tiempo_simulacion != null && tiempo_simulacion != "") {
-                controlarTiempoSimulacion(data_simulacion, tiempo_simulacion);
-            }  
-        }
-
         /*calcula las distribuciones de probabilidad para los tiempos de arrivo y servicio de acuerdo a los datos ingresados*/
         function calcularTabla(filtro, data) {
             console.log("calcularTabla");
-            var prob_acum = 0;
+            var prob_acum = 0.0;
             for (var i = 0; i < data.length; i++) {
                 prob_acum += data[i][1];
                 data[i][2] = prob_acum.toFixed(3);
@@ -195,18 +188,26 @@
                 row += rowini + val[0] + rowconex + val[1] + rowconex + val[2] + rowconex + val[3] + rowconex + val[4] + rowend;
             });
 
-            (filtro == 1) ? $('#tbArrivos > tbody:last-child').append(row) : $('#tbServicio > tbody:last-child').append(row);
+            if (filtro == 1) {
+                $('#tbArrivos > tbody').html("");
+                $('#tbArrivos > tbody:last-child').append(row)
+                $('#pnlTablaArrivos').show();
+            } else {
+                $('#tbServicio > tbody').html("");
+                $('#tbServicio > tbody:last-child').append(row);
+                $('#pnlTablaServicio').show();
+            }
         }
 
         /*Controla la ejecucion y carga de datos de la simulación*/
-        function controlarTiempoSimulacion(data, limite) {
+        function controlarTiempoSimulacion(data, dstribArrivo, distribServicio, limite) {
             console.log("calcularSimulacion");
             var sumatoria = 0;
 
             while (sumatoria < limite) {
                 sumatoria = 0;
 
-                calcularArrivoxServicio(data, tiempo_arrivos, tiempo_servicio);
+                calcularArrivoxServicio(data, dstribArrivo, distribServicio);
                 calcularColaSimulacion(data);
 
                 $.each(data, (index, v) => {
@@ -214,27 +215,27 @@
                 });
             }
             console.log("sumatoria => " + sumatoria);
-            console.log("tiempo_simulacion => " + tiempo_simulacion);
+            console.log("tiempo_simulacion => " + limite);
             cargarTablaSimulacion(data);
         }
 
 
-        function calcularArrivoxServicio(simulacion, probArrivo, probServicio) {
+        function calcularArrivoxServicio(dt_simulacion, probArrivo, probServicio) {
             console.log("calcularArrivoxServicio");
             var randomArrivos = (Math.random() * (1.0 - 0.000) + 0.000).toFixed(3);
             var randomServicio = (Math.random() * (1.0 - 0.000) + 0.000).toFixed(3);
-            var indice = simulacion.length;
+            var indice = dt_simulacion.length;
 
             $.each(probArrivo, (index, v) => {
                 if (randomArrivos >= v[3] && randomArrivos <= v[4]) {
-                    simulacion.push([indice + 1, randomArrivos, v[0], 0, 0, 0, 0, 0, 0, 0]);
+                    dt_simulacion.push([indice + 1, randomArrivos, v[0], 0, 0, 0, 0, 0, 0, 0]);
                 }
             });
 
             $.each(probServicio, (index, v) => {
                 if (randomServicio >= v[3] && randomServicio <= v[4]) {
-                    simulacion[indice][5] = randomServicio;
-                    simulacion[indice][6] = v[0];
+                    dt_simulacion[indice][5] = randomServicio;
+                    dt_simulacion[indice][6] = v[0];
                 }
             })
         }
